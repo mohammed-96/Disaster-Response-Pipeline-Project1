@@ -48,5 +48,3 @@ this line will do Machine Learning Pipeline to train a model able to classify te
 python run.py
 ```
 Go to http://0.0.0.0:3001/
-
-This will start the web app and will direct you to a URL where you can enter messages and get classification results for it.
