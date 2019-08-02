@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier , AdaBoostClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.metrics import classification_report, f1_score
+from sklearn.metrics import classification_report , f1_score , precision_score , recall_score
 from sklearn.model_selection import GridSearchCV
 nltk.download()
 nltk.download('punkt')
@@ -71,10 +71,19 @@ def build_model():
 def evaluate_model(model, X_test, y_test, category_names):
     y_pred = pd.DataFrame(model.predict(X_test) , columns=y_test.columns)
     total_f1_score = []
+    total_recall_score = []
+    total_precision_score = []
+    category_names = Y.columns.tolist()
+
     print(classification_report(y_test, y_pred ,target_names=category_names) )
     for col in y_test.columns.unique():
-        total_f1_score.append(f1_score(y_test[col].values, y_pred[col].values , average='weighted' ))
+        total_f1_score.append(f1_score(y_test[col].values, y_pred[col].values , average='weighted'))
+        total_recall_score.append(recall_score(y_test[col].values, y_pred[col].values , average='weighted'))
+        total_precision_score.append(precision_score(y_test[col].values, y_pred[col].values , average='weighted'))
+
     print('avr f1 score is:' , np.mean(total_f1_score))
+    print('avr recall score is:' , np.mean(total_recall_score))
+    print('avr precision score is:' , np.mean(total_precision_score))
 
 
 def save_model(model, model_filepath):
