@@ -2,30 +2,31 @@ import sys
 import pandas as pd
 from sqlalchemy import create_engine
 
+
 def load_data(messages_filepath, categories_filepath):
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
-    df = pd.merge(messages , categories , on='id')
+    df = pd.merge(messages, categories, on='id')
 
     return df
 
 
-
 def clean_data(df):
-    categories = df.categories.str.split(';' ,expand=True)
+    categories = df.categories.str.split(';', expand=True)
     row = categories.iloc[[0]].values.tolist()[0]
     category_colnames = [i.split('-')[0] for i in row]
     categories.columns = category_colnames
-    for column in categories:
-        categories[column] = categories[column].str.split('-').str[1].astype(int)
-        
-    df.drop(columns=['categories'] ,inplace=True)
-    df = pd.concat([df,categories] ,axis=1)
+    for col in categories:
+        categories[col] = categories[col].str.split('-').str[1].astype(int)
+    df.drop(columns=['categories'], inplace=True)
+    df = pd.concat([df, categories], axis=1)
     return df.drop_duplicates()
+
 
 def save_data(df, database_filename):
     engine = create_engine('sqlite:///{}'.format(database_filename))
-    df.to_sql('disaster_response', engine.raw_connection(),if_exists='replace', index=False) 
+    df.to_sql('disaster_response', engine.raw_connection(),
+              if_exists='replace', index=False)
 
 
 def main():
@@ -41,15 +42,13 @@ def main():
         df = clean_data(df)
         print('Saving data...\n    DATABASE: {}'.format(database_filepath))
         save_data(df, database_filepath)
-        
         print('Cleaned data saved to database!')
-    
     else:
-        print('Please provide the filepaths of the messages and categories '\
-              'datasets as the first and second argument respectively, as '\
-              'well as the filepath of the database to save the cleaned data '\
-              'to as the third argument. \n\nExample: python process_data.py '\
-              'disaster_messages.csv disaster_categories.csv '\
+        print('Please provide the filepaths of the messages and categories '
+              'datasets as the first and second argument respectively, as '
+              'well as the filepath of the database to save the cleaned data '
+              'to as the third argument. \n\nExample: python process_data.py '
+              'disaster_messages.csv disaster_categories.csv '
               'DisasterResponse.db')
 
 
